@@ -6,38 +6,52 @@
 </head>
 <body>
     <h1>Voting Information</h1>
+    <p id="studentIdDisplay"></p>
     
     <h2>Candidates</h2>
     <div class="container">
-        <form action="{{ route('vote.cast') }}" method="POST">
+        <form method="POST" action="{{ route('voting.store') }}">
             @csrf
-            <input type="hidden" name="student_id" id="student_id">
+
             @foreach($positions as $position)
-                <h1>{{ $position->name }}</h1>
+                <h2>{{ $position->name }}</h2>
                 <div class="container row">
                     @foreach($position->candidates as $candidate)
                         <div class="col-4">
                             <p>{{ $candidate->user->first_name }} {{ $candidate->user->last_name }}</p>
                             <p>{{ $candidate->votes }} votes</p>
-                            <input type="radio" name="{{ $position->name }}" value="{{ $candidate->student_id }}" required>
+                            <!-- Radio button to select the candidate, with the value being the candidate's student_id -->
+                            <input type="radio" name="votes[{{ $position->id }}]" value="{{ $candidate->student_id }}" required> Vote for this candidate
                         </div>
                     @endforeach
-                </div> 
+                </div>
             @endforeach
-            <button type="submit" class="btn btn-primary">Submit Vote</button>
+            <button type="submit" class="btn btn-primary" onclick="getStudentId()">Submit Vote</button>
         </form>
+        <!-- Hidden input to hold student ID for form submission -->
+        <input type="hidden" id="studentIdInput" name="student_id">
     </div>
 
     <script>
-        // Retrieve student_id from local storage and set it in the hidden input field
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const studentId = localStorage.getItem('student_id');
-            if (studentId) {
-                document.getElementById('student_id').value = studentId;
-            }
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+    let studentId = localStorage.getItem('student_id');
+    console.log(studentId, 'from localStorage');
+    document.getElementById('studentIdDisplay').textContent = studentId;
+    document.getElementById('studentIdInput').value = studentId;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    fetch('{{ route('voting.getId') }}?student_id=' + studentId)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response from getId:', data);
+        });
+});
+
+
+        function getStudentId() {
+            // This function is triggered when the Submit Vote button is clicked
+            let studentId = localStorage.getItem('student_id');
+            console.log(studentId, 'from localStorage');
+        }
+    </script>
 </body>
 </html>

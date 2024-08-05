@@ -45,5 +45,12 @@ Route::post('/candidates', [CandidateController::class, 'store'])->name('candida
 // Route to handle the deletion of a candidate
 Route::delete('/candidates/{id}', [CandidateController::class, 'destroy'])->name('candidates.destroy');
 
+
 Route::get('/voting', [VotingController::class, 'index'])->name('voting.index');
-Route::post('/vote', [VotingController::class, 'store'])->name('vote.cast');
+
+// Route to handle the vote submission
+Route::post('/voting', [VotingController::class, 'store'])->name('voting.store');
+// web.php
+Route::get('/voting/get-id', [VotingController::class, 'getId'])->name('voting.getId');
+
+
